@@ -38,3 +38,31 @@
         showRandomQuote();
     }
  }
+ let createAddQuoteForm = function (){
+    let formDiv = document.createElement("div");
+    //creating input spaces
+    let inputText = document.createElement("input");
+    inputText.setAttribute("id", "newQuoteText");
+    inputText.setAttribute("type", "text");
+    inputText.setAttribute("placeholder", "Enter a new quote");
+
+    let inputCategory = document.createElement("input");
+   inputCategory.setAttribute("id", "newQuoteText");
+    inputCategory.setAttribute("type", "text");
+   inputCategory.setAttribute("placeholder", "Enter a new quote");
+
+    //creating button
+    let addButton = document.createElement("button");
+    addButton.textContent = "Add Quote";
+    addButton.addEventListener("click", addQuote);
+
+    //Appending everything to the div
+    formDiv.appendChild(inputText);
+    formDiv.appendChild(inputCategory);
+    formDiv.appendChild(addButton);
+
+    //Appending div to body
+    document.body.appendChild(formDiv);
+    
+ }
+ createAddQuoteForm();
