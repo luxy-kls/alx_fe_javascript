@@ -35,8 +35,9 @@
 
         document.getElementById("newQuoteText").value = "";
         document.getElementById("newQuoteCategory").value = "";
-        showRandomQuote();
         saveQuote();
+        populateCategories();
+        showRandomQuote();
     }
  }
  let createAddQuoteForm = function (){
@@ -145,4 +146,51 @@ function importFromJsonFile(event) {
     fileReader.readAsText(event.target.files[0]);
   }
 
+  //Populating Categories dynamically 
+  let populateCategories = function () {
+   let categories = [ ...new Set(quotes.map(quote => quote.category))];
 
+   let filter = document.getElementById("categoryFilter");
+   filter.innerHTML =`<option value="all">All Categories</option>`;
+
+   categories.forEach(category => {
+      let newOption = document.createElement("option");
+      newOption.value = category;
+      newOption.textContent = category;
+      filter.appendChild(newOption);
+   })
+  }
+
+let filterQuotes = function() {
+   let filter = document.getElementById("categoryFilter");
+
+   let selectedCategory = filter.value;
+   let filteredQuotes;
+   if(selectedCategory === "all") {
+      filteredQuotes = quotes;
+   } else {
+      filteredQuotes = quotes.filter(quote => quote.category === selectedCategory);
+   }
+
+   let  filteredArray = filteredQuotes.length*Math.random();
+   let filteredDisplay = Math.floor(filteredArray);
+
+   let randomQuotes = filteredQuotes[filteredDisplay];
+
+   let display = document.getElementById("quoteDisplay");
+   display.innerHTML = `<p> <em> ${randomQuotes.text}</em> - ${randomQuotes.category}</p>`;
+
+   localStorage.setItem("lastSelectedCategory", selectedCategory);
+}
+ 
+let savedCategory = localStorage.getItem("lastSelectedCategory");
+let filter = document.getElementById("caategoryFilter");
+
+if(savedCategory) {
+   filter.value=savedCategory;
+   filterQuotes();
+}  else {
+   filterQuotes();
+}
+
+filter.addEventListener("change", filterQuotes);
