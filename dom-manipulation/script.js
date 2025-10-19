@@ -194,3 +194,51 @@ if(savedCategory) {
 }
 
 filter.addEventListener("change", filterQuotes);
+
+//fetching data from server
+async function fetchQuotesFromServer(){
+   try {
+      const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+      const serverPosts = await response.json();
+
+      //Transform posts to quotesformat (take first 5 examples as an example)
+      const serverQuotes = serverPosts.slice(0,5).map(post => ({
+         text: post.title,
+         category : "Server"
+      }));
+      return serverQuotes ;
+   } catch (error) {
+      console.error("Error fetching quotes:", error);
+      return [];
+   }
+}
+
+//Implementing data syncing
+async function syncQuotes(){
+   try{
+      const serverQuotes = await fetchQuotesFromServer();
+
+      if(serverQuotes && serverQuotes.length > 0){
+         quotes = serverQuotes;
+         saveQuotes();
+         populateCategories();
+         filterQuotes();
+
+         alert(`Quotes synced with server`);
+      }
+   }catch (error) {
+      console.error(`Error syncing quotes:`, error)
+   }
+}
+setInterval(syncQuotes, 30000);
+
+function showNotification(message){
+   let note =document.getElementById("notification");
+   let noteText = document.getElementById("notificationText");
+   noteText.textContent = message;
+   note.style.display = "block";
+
+   setTimeout(() => {
+      note.style.display = "none";
+   }, 3000);
+}
