@@ -352,7 +352,7 @@ async function syncQuotes() {
           `Sync completed with ${conflicts.length} conflicts resolved (server data used).`
         );
       } else {
-        showNotification("Quotes synced successfully with server!");
+        showNotification("Quotes synced with server!");
       }
     }
   } catch (error) {
