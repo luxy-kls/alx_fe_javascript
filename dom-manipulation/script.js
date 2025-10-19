@@ -261,6 +261,25 @@ async function fetchQuotesFromServer() {
   }
 }
 
+async function postQuoteToServer(newQuote) {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST", // ✅ This is the key part
+      headers: {
+        "Content-Type": "application/json" // ✅ Required for JSON data
+      },
+      body: JSON.stringify(newQuote) // ✅ Converts JS object into JSON text
+    });
+
+    const data = await response.json();
+    console.log("Quote successfully posted to server:", data);
+    return data;
+  } catch (error) {
+    console.error("Error posting quote:", error);
+  }
+}
+
+
 // Function to save quotes to localStorage
 function saveQuotes() {
   localStorage.setItem("quotes", JSON.stringify(quotes));
