@@ -213,7 +213,7 @@ async function fetchQuotesFromServer(){
    }
 }
 
-//Implementing data syncing
+/*Implementing data syncing
 async function syncQuotes(){
    try{
       const serverQuotes = await fetchQuotesFromServer();
@@ -241,4 +241,106 @@ function showNotification(message){
    setTimeout(() => {
       note.style.display = "none";
    }, 3000);
+}*/
+// Simulated server interaction using JSONPlaceholder or mock API
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    const data = await response.json();
+
+    // Convert mock data into quote objects (simulate server structure)
+    return data.slice(0, 5).map(item => ({
+      id: item.id,
+      text: item.title,
+      author: "Server Author",
+      timestamp: Date.now()
+    }));
+  } catch (error) {
+    console.error("Error fetching quotes from server:", error);
+    return [];
+  }
 }
+
+// Function to save quotes to localStorage
+function saveQuotes() {
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+}
+
+// Function to load quotes from localStorage
+function loadQuotes() {
+  const saved = localStorage.getItem("quotes");
+  return saved ? JSON.parse(saved) : [];
+}
+
+// Function to display notifications
+function showNotification(message) {
+  const note = document.getElementById("notification");
+  const noteText = document.getElementById("notificationText");
+  noteText.textContent = message;
+  note.style.display = "block";
+
+  setTimeout(() => {
+    note.style.display = "none";
+  }, 3000);
+}
+
+// Implementing data syncing with conflict resolution
+async function syncQuotes() {
+  try {
+    const serverQuotes = await fetchQuotesFromServer();
+
+    if (serverQuotes && serverQuotes.length > 0) {
+      const localQuotes = loadQuotes();
+      const mergedQuotes = [];
+      const conflicts = [];
+
+      // Merge local and server data
+      serverQuotes.forEach(serverQuote => {
+        const localMatch = localQuotes.find(q => q.id === serverQuote.id);
+
+        if (localMatch) {
+          // Conflict detected — server version takes precedence
+          if (localMatch.text !== serverQuote.text) {
+            conflicts.push({
+              local: localMatch,
+              server: serverQuote
+            });
+          }
+          mergedQuotes.push(serverQuote);
+        } else {
+          // New server quote not in local
+          mergedQuotes.push(serverQuote);
+        }
+      });
+
+      // Add any new local quotes that don't exist on the server
+      localQuotes.forEach(localQuote => {
+        const existsOnServer = serverQuotes.some(q => q.id === localQuote.id);
+        if (!existsOnServer) mergedQuotes.push(localQuote);
+      });
+
+      // Save merged data locally
+      quotes = mergedQuotes;
+      saveQuotes();
+
+      // Update UI (your existing functions)
+      populateCategories();
+      filterQuotes();
+
+      // Notify user
+      if (conflicts.length > 0) {
+        showNotification(
+          `Sync completed with ${conflicts.length} conflicts resolved (server data used).`
+        );
+      } else {
+        showNotification("Quotes synced successfully with server!");
+      }
+    }
+  } catch (error) {
+    console.error("Error syncing quotes:", error);
+    showNotification("Error syncing quotes. Please check your connection.");
+  }
+}
+
+// Periodic syncing every 30 seconds
+setInterval(syncQuotes, 30000);
