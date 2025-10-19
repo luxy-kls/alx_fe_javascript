@@ -50,7 +50,7 @@
     let inputCategory = document.createElement("input");
    inputCategory.setAttribute("id", "newQuoteText");
     inputCategory.setAttribute("type", "text");
-   inputCategory.setAttribute("placeholder", "Enter a new quote");
+   inputCategory.setAttribute("placeholder", "Enter a category");
 
     //creating button
     let addButton = document.createElement("button");
@@ -104,5 +104,45 @@ if(quotes.length ===0){
      { text: "Success is not final, failure is not fatal: it is the courage to continue that counts" , category : "Motivational"}
  ]
 }
+
+//Exporting quotes as .json file
+let exportToJsonFile = function () {
+   //converting quotes to string
+   let quoteConverter = JSON.stringify(quotes, null, 2);
+   
+   //Adding blob
+   let blob = new Blob([quoteConverter],
+      { type : "application/json"}
+   )
+
+   //generating temporary url
+   let url = URL.createObjectURL(blob);
+
+   //Adding link 
+   let link = document.createElement("a");
+   link.href = url;
+   link.download = "quotes.json";
+
+   //Appending link to Body, adding click and removing it
+   document.body.appendChild(link);
+   link.click();
+   document.body.removeChild(link);
+}
+
+   //The Export button
+   let exportButton = document.getElementById("exportQuotes");
+   exportButton.addEventListener("click", exportToJsonFile);
+
+// Importing ...
+function importFromJsonFile(event) {
+    const fileReader = new FileReader();
+    fileReader.onload = function(event) {
+      const importedQuotes = JSON.parse(event.target.result);
+      quotes.push(...importedQuotes);
+      saveQuotes();
+      alert('Quotes imported successfully!');
+    };
+    fileReader.readAsText(event.target.files[0]);
+  }
 
 
